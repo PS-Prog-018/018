@@ -1,0 +1,74 @@
+function control(inputs) {
+
+    // 	Motores
+    var Motor_Esq, Motor_Dir;
+
+    // Ultrassoms
+    var ultrassom_Dir = inputs["distance-right"];
+    var ultrassom_Esq  = inputs["distance-left"];
+
+    // Sensores infravermelhos
+    var Infra_Esq  = inputs["front-left"];
+    var Infra_Dir  = inputs["front-right"];
+
+    // Variaveis axuiliares;
+    var dist = 300;
+    var vel_ataque = 40;
+    var vel_procura = 10;
+    
+    // Caso os dois sensores encontrem a borda
+    if(Infra_Esq > 0.25 && Infra_Dir > 0.25 ){
+           Motor_Esq = -vel_ataque;
+            Motor_Dir = vel_ataque;
+    }
+
+    // Caso sensor direito encontre a borda 	
+    if(Infra_Esq > 0.25 || Infra_Dir > 0.25 ){
+           Motor_Esq = -vel_procura;
+            Motor_Dir = -vel_procura;
+    }
+
+    // Caso sensor esquerdo encontre a borda 	
+    if(Infra_Esq > 0.25 || Infra_Dir > 0.25||Infra_Esq > 0.25 && Infra_Dir > 0.25 ){
+            Motor_Esq = vel_procura ;
+            Motor_Dir = vel_procura;
+    }
+
+    // Caso o robô esteja dentro da pista 
+    else if(Infra_Esq < 0.25 || Infra_Dir < 0.25 || Infra_Esq < 0.25 && Infra_Dir < 0.25 ){
+	 
+	// Caso ultrassom direito encontre oponente, vire a direita
+    	 if ( ultrassom_Dir < dist && ultrassom_Esq == dist ) {
+       	    Motor_Esq = vel_procura ;
+            Motor_Dir = vel_procura;
+         } 
+        
+	// Caso ultrassom esquerdo encontre oponente, vire a esquerda
+         else if ( ultrassom_Dir == dist && ultrassom_Esq < dist ) {
+            Motor_Esq = -vel_procura;
+            Motor_Dir = -vel_procura;
+         }
+    	
+	// Caso OS 2 ultrassons identifique o oponente, frente
+         else if ( ultrassom_Dir < dist && ultrassom_Esq < dist ) {
+            Motor_Esq = vel_ataque;
+            Motor_Dir = -vel_ataque;
+         } 
+        
+	// Esse if procura o opononente, roda para o lado direito identificando o local
+         else if ( ultrassom_Dir == dist && ultrassom_Esq == dist ) {
+            Motor_Esq = vel_procura;
+            Motor_Dir = vel_procura;
+         }
+     }
+
+    // retorna os valores do programa para o robô, seria 'Output' saida de dados    
+    return {
+        leftSpeed:  Motor_Esq,
+        rightSpeed: Motor_Dir,
+        log: [
+            { name: 'ultrassom_Dir', value: ultrassom_Dir, min: 0, max: 300 },
+            { name: 'ultrassom_Esq', Value: ultrassom_Esq,  min: 0, max: 300 },
+        ]
+   };
+}
